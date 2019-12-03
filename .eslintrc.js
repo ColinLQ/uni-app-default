@@ -19,5 +19,6 @@ module.exports = {
   globals: {
     getCurrentPages: true,
     uni: true,
+    __wxConfig: true,
   }
 }

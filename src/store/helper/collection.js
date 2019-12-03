@@ -20,7 +20,7 @@ export class Collection extends SimpleStore {
   }
 
   fetchMoreData() {
-    if (this.uniLoadMore !== 'more') { return; }
+    if (this.loadMoreStatue !== 'more') { return; }
     this.params.offset = this.data.length
     return this.fetching(async () => {
       const { data, meta } = await this.fetch(this.params)
@@ -31,7 +31,12 @@ export class Collection extends SimpleStore {
 
   resetData() {
     this.isFulfilled = false
-    this.data.clear()
+    this.data = []
+  }
+
+  removeItemById(id) {
+    const index = this.data.findIndex(item => String(item.id) === String(id));
+    index !== -1 && this.data.splice(index, 1);
   }
 
   get params() {
@@ -50,10 +55,10 @@ export class Collection extends SimpleStore {
     return this.isFulfilled && this.meta.total === 0
   }
 
-  get uniLoadMore() {
+  get loadMoreStatue() {
     if (this.isEmpty) { return 'empty' }
     if (this.isComplete) { return 'noMore' }
-    if (this.isFetching && this.isFulfilled) { return 'loading' }
+    if (this.isFetching) { return 'loading' }
     return 'more'
   }
 }
