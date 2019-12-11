@@ -31,4 +31,4 @@ class UiStore extends SimpleStore {
   }
 }
 
-export const uiStore = new UiStore();
+export const uiStore = UiStore.create();

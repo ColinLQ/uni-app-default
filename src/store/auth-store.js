@@ -99,4 +99,4 @@ export class AuthStore extends SimpleStore {
   }
 }
 
-export const authStore = new AuthStore();
+export const authStore = AuthStore.create();

@@ -2,62 +2,35 @@
   <div class="relative" @click="handleClick">
     <slot/>
     <button
-      :open-type="staticOpenType"
+      :open-type="authorizeStore.scopeAuthorize[openType]"
       class="open-type-btn"
       @error="$emit('error', $event)"
       @opensetting="handleOpensetting"
-      v-if="staticOpenType"
+      v-if="authorizeStore.scopeAuthorize[openType]"
     >open type</button>
   </div>
 </template>
 
 <script>
   import { Vue, Component, Prop } from 'vue-property-decorator'
-
-  // scope 对照表
-  const scopeList = {
-    getLocation: 'scope.userLocation',
-    chooseLocation: 'scope.userLocation',
-    startLocationBackground: 'scope.userLocationBackground',
-    chooseAddress: 'scope.address',
-    chooseInvoiceTitle: 'scope.invoiceTitle',
-    chooseInvoice: 'scope.invoice',
-    getWeRunData: 'scope.werun',
-    startRecord: 'scope.record',
-    saveVideoToPhotosAlbum: 'scope.writePhotosAlbum',
-    saveImageToPhotosAlbum: 'scope.writePhotosAlbum',
-  }
+  import { authorizeStore } from '@/store'
 
   @Component
   export default class AuthorizeBtn extends Vue {
     @Prop({ type: String }) openType
     @Prop({ type: Object, default: () => ({}) }) params
 
-    staticOpenType = null;
+    authorizeStore = authorizeStore
 
     created() {
-      this.checkScope()
-    }
-
-    // 检查是否打开对应权限
-    async checkScope() {
-      const scope = scopeList[this.openType];
-      if (scope) {
-        try {
-          await uni.authorize({
-            scope: scope
-          });
-        } catch (e) {
-          this.staticOpenType = 'openSetting';
-        }
-      }
+      authorizeStore.checkScope(this.openType)
     }
 
     async handleOpensetting(e) {
-      const scope = scopeList[this.openType];
+      const scope = authorizeStore.getScope(this.openType);
       if (e.detail.authSetting[scope]) {
         const res = await uni[this.openType](this.params);
-        this.staticOpenType = null;
+        authorizeStore.updateScopeAuthorize(this.openType, false)
         this.$emit('success', res);
       }
     }
@@ -67,7 +40,8 @@
         const res = await uni[this.openType](this.params);
         this.$emit('success', res);
       } catch (e) {
-        this.checkScope();
+        authorizeStore.checkList[this.openType] = false;
+        authorizeStore.checkScope(this.openType);
       }
     }
   }
