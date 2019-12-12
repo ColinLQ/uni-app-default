@@ -1,5 +1,6 @@
 stages:
   - test
+  - build
 
 cache:
   key: node_modules
@@ -8,8 +9,22 @@ cache:
 
 before_script:
   - nodenv shell 11.13.0
+  - shopt -s expand_aliases # 开启扩展aliases功能 issue https://gitlab.com/gitlab-org/gitlab-runner/issues/1083
+  - alias wxcli="/Applications/wechatwebdevtools.app/Contents/Resources/app.nw/bin/cli" # 指定微信开发者工具cli命名为wxcli
   - yarn install
 
 test:
   script:
     - yarn run lint
+
+deploy_staging:
+  stage: build # 对应stages上的job名称
+  script:
+    - yarn staging:mp-weixin
+    - curr_version=`date +%y%m%dT%H` # 版本号
+    - curr_proj_path=`pwd`/dist/build/mp-weixin # 当前项目路径
+    - wxcli -u $curr_version@$curr_proj_path --upload-desc staging # 提交微信开发者
+  only:
+    - staging
+  tags:
+    - mac-shell-runner
