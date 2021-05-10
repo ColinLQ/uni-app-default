@@ -47,7 +47,7 @@
     "@dcloudio/uni-stat": "^2.0.0-23220190921001",
     "dayjs": "^1.8.16",
     "flyio": "^0.6.2",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "regenerator-runtime": "^0.12.1",
     "vue": "^2.6.10",
     "vue-property-decorator": "^8.2.1"
